@@ -6,7 +6,6 @@ from datetime import datetime
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 
 engine = create_engine(f"sqlite:///{home}db.sqlite", poolclass=QueuePool,
@@ -49,5 +48,19 @@ def add_user(chat_id, username, firstname, lastname, timejoined=datetime.now()):
     except:
         session.rollback()
         return False
+    finally:
+        session.close()
+
+
+def add_usage(chat_id):
+    session = sessionmaker(bind=engine)()
+
+    try:
+        user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
+
+        if user_data:
+            user_data.total_usage += 1
+        session.commit()
+
     finally:
         session.close()

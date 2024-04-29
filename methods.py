@@ -19,16 +19,13 @@ def check_membership(context, chat_id):
 # ###################################################### keyboards
 
 
-# admin_panel = [
-#     InlineKeyboardButton("edit join channel", callback_data='join_channel')], [
-#     InlineKeyboardButton("edit sponser", callback_data='ads')], [
-#     InlineKeyboardButton("send to all", callback_data='sendall')], [
-#     InlineKeyboardButton("statistics", callback_data='static')], [
-#     InlineKeyboardButton("send data base", callback_data='db')]
-# admin_command = "home"
+admin_panel = [
+    InlineKeyboardButton("send to all", callback_data='sendall')], [
+    InlineKeyboardButton("send data base", callback_data='db')]
+admin_panel = InlineKeyboardMarkup(admin_panel)
+
 
 join_channel_keyboard = []
-
 for channel in join_channel.keys():
 
     join_channel_keyboard.append(

@@ -4,15 +4,13 @@
 
 import methods
 import llama
-from creds import bot_token, admin
+from creds import bot_token, admin, home
 import database as db
 
-from json import load
 from time import sleep
-from os import remove
 
 from telegram.update import Update
-from threading import Thread, enumerate, Lock
+from threading import Thread, enumerate
 from telegram.ext import Updater, CallbackContext, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
 
@@ -66,12 +64,11 @@ def thread_promthandler(update, context):
         answer = llama.ask_llama(promt)
 
         i = 0
-
         for chunk in answer:
             i += 1
             try:
                 stream_answer += chunk.choices[0].delta.content
-                if i % 5 == 0:
+                if i % 19 == 0:
                     context.bot.edit_message_text(
                         chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer)
             except:
@@ -79,6 +76,8 @@ def thread_promthandler(update, context):
 
         context.bot.edit_message_text(
             chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer[length_strean:])
+
+        db.add_usage(chat_id)
 
     except Exception as error:
         context.bot.send_message(
@@ -103,7 +102,15 @@ def thread_callbackquery(update, context):
         else:
             query.answer("you are not joined tho :(((")
 
+    if query.message.chat_id == admin:
+        if query.data == "db":
+            context.bot.send_document(
+                chat_id=admin, document=open(home + 'db.sqlite', "rb"))
 
+def thread_admin(update, context):
+    if update.message.chat_id == admin:
+        update.message.reply_text(
+            'wellcome admin', reply_markup=methods.admin_panel)
 ######################################################################################################################################
 ######################################################################################################################################
 
@@ -126,8 +133,12 @@ def callbackquery(update: Update, context: CallbackContext):
     Thread(target=thread_callbackquery, args=(update, context, )).start()
 
 
-def help(update: Update, context: CallbackContext):
+def help_(update: Update, context: CallbackContext):
     Thread(target=thread_help, args=(update, context)).start()
+
+
+def admin_(update: Update, context: CallbackContext):
+    Thread(target=thread_admin, args=(update, context)).start()
 
 
 print("going live...")
@@ -138,7 +149,8 @@ while True:
         updater.dispatcher.add_handler(CommandHandler('start', start))
         updater.dispatcher.add_handler(CommandHandler('restart', start))
 
-        updater.dispatcher.add_handler(CommandHandler('help', help))
+        updater.dispatcher.add_handler(CommandHandler('help', help_))
+        updater.dispatcher.add_handler(CommandHandler('admin', admin_))
 
         updater.dispatcher.add_handler(CallbackQueryHandler(callbackquery))
         updater.dispatcher.add_handler(
