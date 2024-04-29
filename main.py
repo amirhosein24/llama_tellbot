@@ -15,8 +15,6 @@ from telegram.update import Update
 from threading import Thread, enumerate, Lock
 from telegram.ext import Updater, CallbackContext, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
-# home = __file__[:-7] TODO
-
 
 def active_thread(name):
     for thread in enumerate():
@@ -67,20 +65,24 @@ def thread_promthandler(update, context):
     try:
         answer = llama.ask_llama(promt)
 
+        i = 0
+
         for chunk in answer:
+            i += 1
             try:
                 stream_answer += chunk.choices[0].delta.content
-                context.bot.edit_message_text(
-                    chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer)
+                if i % 5 == 0:
+                    context.bot.edit_message_text(
+                        chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer)
             except:
                 pass
 
         context.bot.edit_message_text(
             chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer[length_strean:])
 
-    except Exception as e:
+    except Exception as error:
         context.bot.send_message(
-            chat_id=admin, text=f"error in main q handler: " + str(e))
+            chat_id=admin, text=f"error in main q handler: " + str(error))
 
 
 def thread_help(update, context):
