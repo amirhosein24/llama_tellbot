@@ -35,3 +35,11 @@ join_channel_keyboard.append(
     [InlineKeyboardButton("i joined :)", callback_data='joined')])
 
 join_channel_keyboard = InlineKeyboardMarkup(join_channel_keyboard)
+
+
+model_keyboard = [
+    InlineKeyboardButton("llama 3 8b : faster but less accurete", callback_data="model_llama3-8b-8192")], [
+    InlineKeyboardButton(
+        "llama 3 70b : slower but more accurate", callback_data="model_llama3-70b-8192")
+]
+model_keyboard = InlineKeyboardMarkup(model_keyboard)
