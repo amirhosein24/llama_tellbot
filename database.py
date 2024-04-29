@@ -26,6 +26,7 @@ class UserData(Base):
     timejoined = Column(DateTime)
     total_usage = Column(Integer, default=0)
     limiter = Column(Integer, default=0)
+    model = Column(String, default="llama3-8b-8192")
 
 
 Base.metadata.create_all(bind=engine)  # Create tables if not exist
@@ -61,6 +62,35 @@ def add_usage(chat_id):
         if user_data:
             user_data.total_usage += 1
         session.commit()
+    except:
+        session.rollback()
+    finally:
+        session.close()
 
+
+def change_model(chat_id, model):
+    session = sessionmaker(bind=engine)()
+
+    try:
+        user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
+
+        if user_data:
+            user_data.model = model
+
+        session.commit()
+    except:
+        session.rollback()
+    finally:
+        session.close()
+
+
+def get_current_model(chat_id):
+    session = sessionmaker(bind=engine)()
+
+    try:
+        user_data = session.query(UserData).filter_by(chat_id=chat_id).first()
+        return user_data.model
+    except:
+        return False
     finally:
         session.close()

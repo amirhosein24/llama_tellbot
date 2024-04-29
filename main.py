@@ -38,54 +38,72 @@ def thread_start(update, context):
                                       reply_markup=methods.join_channel_keyboard)
             return
 
-        update.message.reply_text(f"wellcome {firstname}, i am llama 3")
+        update.message.reply_text(
+            f"wellcome {firstname}, i am llama 3, ask away 🦙")
 
     except Exception as error:
         context.bot.send_message(
             chat_id=admin, text=f"error in main start handler: " + str(error))
 
 
-def thread_promthandler(update, context):
+def thread_prompthandler(update, context):
+
     chat_id = update.message.chat_id
-    promt = update.message.text
+    prompt = update.message.text
     message_id = update.message.message_id
 
     if not methods.check_membership(context, chat_id):
-        update.message.reply_text('please join our channel in order to use the bot :))',
+        update.message.reply_text('please join our channel in order to use the bot 🦙 :))',
                                   reply_markup=methods.join_channel_keyboard)
         return
 
-    stream_answer = "working on your promt ...\n\n"
+    stream_answer = "working on your prompt ...\n\n"
     length_strean = len(stream_answer)
+
     wait = context.bot.send_message(
         chat_id=chat_id, text=stream_answer, reply_to_message_id=message_id)
 
     try:
-        answer = llama.ask_llama(promt)
+        if update.message.reply_to_message:
+            answer = llama.ask_llama_reply(
+                prompt, update.message.reply_to_message.text, db.get_current_model(chat_id))
+        else:
+            answer = llama.ask_llama(prompt, db.get_current_model(chat_id))
 
         i = 0
         for chunk in answer:
             i += 1
             try:
                 stream_answer += chunk.choices[0].delta.content
-                if i % 19 == 0:
+                if i % 29 == 0:
                     context.bot.edit_message_text(
                         chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer)
             except:
                 pass
 
-        context.bot.edit_message_text(
-            chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer[length_strean:])
+        # context.bot.edit_message_text(
+        #     chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer[length_strean:])
+        # # context.bot.send_message(chat_id=chat_id,
+        # #                          text=stream_answer[length_strean:] + "\n\n<a href=llama 3 telegram bot </a>", parse_mode='HTML', disable_web_page_preview=True)
+        # # print(stream_answer)
+
+        context.bot.edit_message_text(chat_id=chat_id, message_id=wait.message_id,
+                                      text=stream_answer[length_strean:] +
+                                      "\n\n<a href='https://t.me/Llama3ai_bot'>llama 3 tel bot🦙</a>",
+                                      parse_mode='HTML', disable_web_page_preview=True)
 
         db.add_usage(chat_id)
 
     except Exception as error:
+        update.message.reply_text(
+            'unexpected error happend, please try again later 🦙🙄')
         context.bot.send_message(
             chat_id=admin, text=f"error in main q handler: " + str(error))
 
 
 def thread_help(update, context):
-    update.message.reply_text("i am llama 3 🦙")
+    update.message.reply_text(
+        "i am llama 3 🦙\n with both 8 and 70 b parameters\n use /models to change it ")
     if not methods.check_membership(context, update.message.chat_id):
         update.message.reply_text('also make sure to join our channel to use the bot',
                                   reply_markup=methods.join_channel_keyboard)
@@ -102,15 +120,27 @@ def thread_callbackquery(update, context):
         else:
             query.answer("you are not joined tho :(((")
 
+    elif query.data.startswith("model"):
+        db.change_model(query.message.chat_id, query.data[len("model_"):])
+        query.edit_message_text(
+            text=f"active model changed to {query.data[len('model_'):]}")
     if query.message.chat_id == admin:
         if query.data == "db":
             context.bot.send_document(
                 chat_id=admin, document=open(home + 'db.sqlite', "rb"))
 
+
 def thread_admin(update, context):
     if update.message.chat_id == admin:
         update.message.reply_text(
             'wellcome admin', reply_markup=methods.admin_panel)
+
+
+def thread_models(update, context):
+    update.message.reply_text(
+        f'your current model: {db.get_current_model(update.message.chat_id)}\n\nchoose your model : ', reply_markup=methods.model_keyboard)
+
+
 ######################################################################################################################################
 ######################################################################################################################################
 
@@ -122,10 +152,10 @@ def start(update: Update, context: CallbackContext):
            str(update.message.chat_id), args=(update, context,)).start()
 
 
-def promthandler(update: Update, context: CallbackContext):
-    if active_thread("promt_"+str(update.message.chat_id)):
+def prompthandler(update: Update, context: CallbackContext):
+    if active_thread("prompt_"+str(update.message.chat_id)):
         return
-    Thread(target=thread_promthandler, name="promt_" +
+    Thread(target=thread_prompthandler, name="prompt_" +
            str(update.message.chat_id), args=(update, context)).start()
 
 
@@ -141,6 +171,10 @@ def admin_(update: Update, context: CallbackContext):
     Thread(target=thread_admin, args=(update, context)).start()
 
 
+def models(update: Update, context: CallbackContext):
+    Thread(target=thread_models, args=(update, context)).start()
+
+
 print("going live...")
 while True:
     try:
@@ -148,13 +182,14 @@ while True:
         updater = Updater(token=bot_token, use_context=True)
         updater.dispatcher.add_handler(CommandHandler('start', start))
         updater.dispatcher.add_handler(CommandHandler('restart', start))
+        updater.dispatcher.add_handler(CommandHandler('models', models))
 
         updater.dispatcher.add_handler(CommandHandler('help', help_))
         updater.dispatcher.add_handler(CommandHandler('admin', admin_))
 
         updater.dispatcher.add_handler(CallbackQueryHandler(callbackquery))
         updater.dispatcher.add_handler(
-            MessageHandler(Filters.text, promthandler))
+            MessageHandler(Filters.text, prompthandler))
 
         updater.start_polling()
         print("bot is live.")
