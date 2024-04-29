@@ -21,14 +21,9 @@ def ask_llama(promt):
 
         ],
         temperature=1,
-        max_tokens=8192,
+        max_tokens=4096,
         top_p=1,
         stream=True,
         stop=None,
     )
-
-    # for chunk in completion:
-    #     print(chunk.choices[0].delta.content or "",
-    #           end="")  # TODO learn this
-
     return completion
