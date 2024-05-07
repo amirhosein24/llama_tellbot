@@ -1,11 +1,18 @@
+
 from groq import Groq
-from creds import groq_token as token
+from creds import groq_token as groq_api
 
 
-client = Groq(api_key=token)
+def groq_token():
+    if not hasattr(groq_token, 'index'):
+        groq_token.index = 0
+    item = groq_api[groq_token.index]
+    groq_token.index = (groq_token.index + 1) % len(groq_api)
+    return item
 
 
 def ask_llama(prompt, model="llama3-8b-8192"):
+    client = Groq(api_key=groq_token())
 
     completion = client.chat.completions.create(
         model=model,
@@ -30,6 +37,7 @@ def ask_llama(prompt, model="llama3-8b-8192"):
 
 
 def ask_llama_reply(prompt, reply, model="llama3-8b-8192"):
+    client = Groq(api_key=groq_token())
 
     completion = client.chat.completions.create(
         model=model,
