@@ -61,7 +61,7 @@ def thread_prompthandler(update, context):
     length_strean = len(stream_answer)
 
     wait = context.bot.send_message(
-        chat_id=chat_id, text=stream_answer, reply_to_message_id=message_id, parse_mode='MarkdownV2')
+        chat_id=chat_id, text=stream_answer, reply_to_message_id=message_id)
 
     try:
         if update.message.reply_to_message:
@@ -77,7 +77,7 @@ def thread_prompthandler(update, context):
                 stream_answer += chunk.choices[0].delta.content
                 if i % 29 == 0:
                     context.bot.edit_message_text(
-                        chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer, parse_mode='MarkdownV2')
+                        chat_id=update.message.chat_id, message_id=wait.message_id, text=stream_answer)
             except:
                 pass
 
@@ -89,8 +89,8 @@ def thread_prompthandler(update, context):
 
         context.bot.edit_message_text(chat_id=chat_id, message_id=wait.message_id,
                                       text=stream_answer[length_strean:] +
-                                      "\n\n@Llama3ai_bot llama 3 tel bot 🦙</a>",
-                                      parse_mode='MarkdownV2', disable_web_page_preview=True)
+                                      "\n\n<a href='https://t.me/Llama3ai_bot'>llama 3 tel bot🦙</a>",
+                                      parse_mode='HTML', disable_web_page_preview=True)
 
         db.add_usage(chat_id)
 
