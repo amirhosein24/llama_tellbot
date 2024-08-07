@@ -4,7 +4,7 @@
 
 import methods
 import llama
-from creds import bot_token, admin, home
+from creds import bot_token, admin, home, logger
 import database as db
 
 from time import sleep
@@ -30,7 +30,7 @@ def thread_start(update, context):
         lastname = update.message.chat.last_name
 
         if db.add_user(chat_id, username, firstname, lastname):
-            context.bot.send_message(chat_id=admin,
+            context.bot.send_message(chat_id=logger,
                                      text=f"bot started by chat_id: {chat_id}\nname: {firstname}-{lastname}\nusername: @{username}")
 
         if not methods.check_membership(context, chat_id):
