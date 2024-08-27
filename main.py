@@ -55,7 +55,10 @@ def thread_prompthandler(update, context):
     username = update.message.chat.username
     lastname = update.message.chat.last_name
 
-    db.add_user(chat_id, username, firstname, lastname)
+    if db.add_user(chat_id, username, firstname, lastname):
+        pass
+    elif db.get_current_model(chat_id) in ["llama3-8b-8192", "llama3-70b-8192"]:
+        db.change_model(chat_id, "llama-3.1-8b-instant")
 
     if not methods.check_membership(context, chat_id) and chat_id != admin:
         update.message.reply_text('please join our channel in order to use the bot 🦙 :))',
