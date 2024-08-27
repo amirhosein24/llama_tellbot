@@ -51,6 +51,11 @@ def thread_prompthandler(update, context):
     chat_id = update.message.chat_id
     prompt = update.message.text
     message_id = update.message.message_id
+    firstname = update.message.chat.first_name
+    username = update.message.chat.username
+    lastname = update.message.chat.last_name
+
+    db.add_user(chat_id, username, firstname, lastname)
 
     if not methods.check_membership(context, chat_id) and chat_id != admin:
         update.message.reply_text('please join our channel in order to use the bot 🦙 :))',
