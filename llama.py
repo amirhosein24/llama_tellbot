@@ -19,7 +19,7 @@ def ask_llama(prompt, model="llama-3.1-8b-instant"):
         messages=[
             {
                 "role": "system",
-                "content": "you are a helpfull assisstant, answer prompts in same language as prompt"
+                "content": "you are a helpfull assisstant"
             },
             {
                 "role": "user",
@@ -36,6 +36,7 @@ def ask_llama(prompt, model="llama-3.1-8b-instant"):
     return completion
 
 
+
 def ask_llama_reply(prompt, reply, model="llama-3.1-8b-instant"):
     client = Groq(api_key=groq_token())
 
@@ -44,7 +45,7 @@ def ask_llama_reply(prompt, reply, model="llama-3.1-8b-instant"):
         messages=[
             {
                 "role": "system",
-                "content": "you are a helpfull assisstant, answer prompts in same language as prompt"
+                "content": "you are a helpfull assisstant"
             },
             {
                 "role": "assistant",
