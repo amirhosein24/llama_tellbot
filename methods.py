@@ -38,8 +38,8 @@ join_channel_keyboard = InlineKeyboardMarkup(join_channel_keyboard)
 
 
 model_keyboard = [
-    InlineKeyboardButton("llama 3.1 8b : faster but less accurete", callback_data="llama-3.1-8b-instant")], [
+    InlineKeyboardButton("llama 3.1 8b : faster but less accurete", callback_data="model_llama-3.1-8b-instant")], [
     InlineKeyboardButton(
-        "llama 3.1 70b : slower but more accurate", callback_data="llama-3.1-70b-versatile")
+        "llama 3.1 70b : slower but more accurate", callback_data="model_llama-3.1-70b-versatile")
 ]
 model_keyboard = InlineKeyboardMarkup(model_keyboard)
