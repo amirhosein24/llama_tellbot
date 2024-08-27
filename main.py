@@ -1,5 +1,5 @@
 
-# telegrambot with llama 3 api
+# telegrambot with llama 3.1 api
 # writen by : amirhosein heidarinia
 
 import methods
@@ -39,7 +39,7 @@ def thread_start(update, context):
             return
 
         update.message.reply_text(
-            f"wellcome {firstname}, i am llama 3, ask away 🦙")
+            f"wellcome {firstname}, i am llama 3.1, ask away 🦙")
 
     except Exception as error:
         context.bot.send_message(
@@ -52,7 +52,7 @@ def thread_prompthandler(update, context):
     prompt = update.message.text
     message_id = update.message.message_id
 
-    if not methods.check_membership(context, chat_id):
+    if not methods.check_membership(context, chat_id) and chat_id != admin:
         update.message.reply_text('please join our channel in order to use the bot 🦙 :))',
                                   reply_markup=methods.join_channel_keyboard)
         return
@@ -103,7 +103,7 @@ def thread_prompthandler(update, context):
 
 def thread_help(update, context):
     update.message.reply_text(
-        "i am llama 3 🦙\n with both 8 and 70 b parameters\n use /models to change it ")
+        "i am llama 3.1 🦙\n with both 8 and 70 b parameters\n use /models to change it ")
     if not methods.check_membership(context, update.message.chat_id):
         update.message.reply_text('also make sure to join our channel to use the bot',
                                   reply_markup=methods.join_channel_keyboard)

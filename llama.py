@@ -11,7 +11,7 @@ def groq_token():
     return item
 
 
-def ask_llama(prompt, model="llama3-8b-8192"):
+def ask_llama(prompt, model="llama-3.1-8b-instant"):
     client = Groq(api_key=groq_token())
 
     completion = client.chat.completions.create(
@@ -36,7 +36,7 @@ def ask_llama(prompt, model="llama3-8b-8192"):
     return completion
 
 
-def ask_llama_reply(prompt, reply, model="llama3-8b-8192"):
+def ask_llama_reply(prompt, reply, model="llama-3.1-8b-instant"):
     client = Groq(api_key=groq_token())
 
     completion = client.chat.completions.create(

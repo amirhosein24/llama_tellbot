@@ -26,7 +26,7 @@ class UserData(Base):
     timejoined = Column(DateTime)
     total_usage = Column(Integer, default=0)
     limiter = Column(Integer, default=0)
-    model = Column(String, default="llama3-8b-8192")
+    model = Column(String, default="llama-3.1-8b-instant")
 
 
 Base.metadata.create_all(bind=engine)  # Create tables if not exist
